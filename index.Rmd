@@ -1,0 +1,363 @@
+---
+title: "Dados para Geomarketing"
+subtitle: "Unidade 3 | Tópicos Especiais Mercadológicos: Geomarketing"
+author: "Prof.ª Renata Oliveira"
+institute: "CEFET-MG – Departamento de Ciências Sociais Aplicadas"
+date: "Setembro 2026"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "xaringan-themer.css", "slides.css", "course-overrides.css", "zoom.css"]
+    includes:
+      after_body: zoom.html
+    nature:
+      ratio: "16:9"
+      highlightLines: true
+      highlightStyle: solarized-light
+      countIncrementalSlides: false
+      slideNumberFormat: |
+         <div class="progress-bar-container">
+           <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+           </div>
+         </div>
+---
+
+```{r child = "setup.Rmd"}
+
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+```{r xaringan-editable, echo=FALSE}
+xaringanExtra::use_editable(expires = 1)
+
+```
+
+```{r xaringanExtra-clipboard, echo=FALSE}
+htmltools::tagList(
+  xaringanExtra::use_clipboard(
+    button_text = "<i class=\"fa fa-clipboard\"></i>",
+    success_text = "<i class=\"fa fa-check\" style=\"color: #90BE6D\"></i>",
+    error_text = "<i class=\"fa fa-times-circle\" style=\"color: #F94144\"></i>"
+  ),
+  rmarkdown::html_dependency_font_awesome()
+)
+```
+
+```{r xaringan-fit-screen, echo=FALSE}
+xaringanExtra::use_fit_screen()
+
+```
+
+```{r xaringan-extra-styles, echo=FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-scribble, echo=FALSE}
+xaringanExtra::use_scribble()
+```
+
+---
+class: center, middle
+
+# Dados para Geomarketing
+
+.large[
+**Dado certo + escala certa + momento certo** =
+decisão territorial bem fundamentada.
+]
+
+---
+
+## Agenda — Unidade 3 (10h / 3 encontros)
+
+**Encontro 4 (4h)**
+- Taxonomia dos dados espaciais
+- Dados censitários e bases públicas brasileiras
+- APIs e dados abertos: IBGE, IPEA, DataSUS, INEP
+
+**Encontro 5 (4h)**
+- Dados corporativos, transacionais e digitais
+- Dados de mobilidade e footfall
+- Qualidade, escala e limitações
+- QGIS: importar CSV com coordenadas
+
+**Encontro 6 (2h)**
+- Lab prático: pipeline de dados do IBGE no QGIS
+- Limpeza e preparação básica
+
+---
+
+## Taxonomia dos Dados para Geomarketing
+
+.pull-left[
+**Por origem:**
+- Censitários (IBGE)
+- Administrativos (RAIS, CNPJ, IPTU)
+- Pesquisas de mercado
+- Transacionais (PDV, e-commerce)
+- Digitais (social media, Google, apps)
+- Sensoriamento remoto (satélite, drone)
+]
+
+.pull-right[
+**Por granularidade espacial:**
+| Nível | Exemplo |
+|-------|---------|
+| País | PIB nacional |
+| Estado | PNAD por UF |
+| Município | Censo municipal |
+| Bairro | Setor censitário |
+| CEP/Quadra | Malha de endereços |
+| Ponto | Coordenada GPS |
+]
+
+---
+
+## Dados Censitários — IBGE Censo 2022
+
+O **Censo Demográfico** é a fonte mais completa de dados socioeconômicos por setor censitário (~300 domicílios).
+
+.your-turn[
+**Passo a passo — obter dados do Censo 2022 por setor censitário (sem R):**
+
+1. Acessar [censo2022.ibge.gov.br](https://censo2022.ibge.gov.br) → **Agregados por Setores Censitários** e baixar, para Belo Horizonte (código do município 3106200):
+   - a **malha de setores censitários** (formato shapefile ou GeoPackage);
+   - a **tabela CSV de "Total de moradores"** (equivalente à Tabela SIDRA 9514, variável 93);
+   - a **tabela CSV de "Rendimento nominal médio mensal"** (equivalente à Tabela SIDRA 9605, variável 10605).
+2. No QGIS: *Camada → Adicionar Camada → Adicionar Camada Vetorial* → selecionar o shapefile/GeoPackage da malha de setores.
+3. No QGIS: *Camada → Adicionar Camada → Adicionar Camada de Texto Delimitado* → apontar para o CSV de renda, **desmarcando** a opção "Geometria de ponto" (é uma tabela sem coordenadas, só atributos).
+4. Clique direito na camada de setores → **Propriedades → Junções (Joins) → +** → Camada de junção = tabela de renda; Campo de junção = código do setor censitário (`CD_SETOR`); Campo de destino = mesmo código na malha.
+5. Repetir o passo 4 para a tabela de população.
+6. Verificar na **Tabela de Atributos** se os campos `renda_media` e `populacao` foram anexados corretamente aos polígonos.
+]
+
+.footnote[IBGE — Agregados por Setores Censitários: [censo2022.ibge.gov.br](https://censo2022.ibge.gov.br)]
+
+---
+
+## Bases Públicas Federais
+
+.your-turn[
+**Passo a passo — trazer bases federais para o QGIS:**
+
+1. **IPEA Data** (IDH, Gini, PIB municipal): baixar a série desejada em [ipeadata.gov.br](http://www.ipeadata.gov.br) como CSV (ex.: `ADH_IDHM_R`, `ADH_GINI`, por município). No QGIS, usar *Camada → Adicionar Camada → Adicionar Camada de Texto Delimitado*, desmarcando "Geometria de ponto", e depois fazer **Junção** (Propriedades → Joins) com a camada de municípios pelo código IBGE do município.
+2. **DataSUS/CNES** (estabelecimentos de saúde georreferenciados): baixar o arquivo `ESTABDADOS.zip` em `cnes.datasus.gov.br/services/arquivos/`, extrair o CSV com latitude/longitude e importar via *Camada → Adicionar Camada de Texto Delimitado*, definindo X = longitude e Y = latitude.
+3. **INEP** (escolas com coordenadas): baixar os microdados do Censo Escolar em [download.inep.gov.br/dados_abertos](https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2023.zip), filtrar o município desejado em uma planilha e importar da mesma forma que o CNES.
+4. **CNPJ/Receita Federal** (cadastro de empresas): baixar o dataset em [dados.gov.br](https://dados.gov.br/dados/conjuntos-dados/cadastro-nacional-da-pessoa-juridica---cnpj), filtrar por CNAE e município, e importar como camada de texto delimitado (se já tiver lat/lon) ou geocodificar o endereço com o plugin **MMQGIS** (ver próximos slides).
+]
+
+---
+
+## Dados Abertos: onde encontrar
+
+| Portal | URL | Destaque |
+|--------|-----|----------|
+| **IBGE** | [ibge.gov.br/geociencias](https://www.ibge.gov.br/geociencias) | Malhas, setores, censo |
+| **dados.gov.br** | [dados.gov.br](https://dados.gov.br) | +30 mil datasets federais |
+| **IPEA** | [ipeadata.gov.br](http://www.ipeadata.gov.br) | Séries econômicas e sociais |
+| **DataSUS** | [datasus.saude.gov.br](https://datasus.saude.gov.br) | Saúde, CNES, SIM, SINASC |
+| **INEP** | [inep.gov.br/microdados](https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados) | Educação, ENEM, Censo Escolar |
+| **OpenStreetMap** | [overpass-turbo.eu](https://overpass-turbo.eu) | POI, vias, edificações |
+| **ANTT/ANAC** | [dados.gov.br](https://dados.gov.br) | Transporte, aeroportos |
+
+---
+
+## OpenStreetMap via QGIS
+
+.your-turn[
+**Passo a passo — extrair farmácias de BH com o QuickOSM:**
+
+1. Instalar o plugin: *Complementos → Gerenciar e Instalar Complementos* → buscar **QuickOSM** → Instalar.
+2. Abrir *Complementos → QuickOSM → QuickOSM*.
+3. Na aba "Consulta rápida": Key = `amenity`, Value = `pharmacy`.
+4. Em "Área de interesse", escolher **Selecionar por lugar** e digitar `Belo Horizonte, Brazil` (o QuickOSM resolve o nome via Nominatim e monta o bounding box automaticamente).
+5. Clicar em **Executar consulta**.
+6. O QuickOSM adiciona automaticamente uma camada de pontos (e, se houver, polígonos/linhas) com todas as farmácias de BH mapeadas no OSM.
+7. Para estilizar: *Propriedades da camada → Simbologia* → símbolo único, cor `#E9AFA3`.
+]
+
+.tip[
+O QuickOSM consulta a **Overpass API** por trás dos panos — gratuita, sem limite de requisições para consultas moderadas. Ideal para POI, vias, edificações.
+]
+
+.footnote[QuickOSM: [plugins.qgis.org/plugins/QuickOSM](https://plugins.qgis.org/plugins/QuickOSM/)]
+
+---
+
+## Dados Corporativos e Transacionais
+
+.pull-left[
+**Fontes corporativas típicas:**
+- Histórico de transações (PDV, e-commerce)
+- Cadastro de clientes com CEP
+- CRM com localização de visitas
+- Dados de fidelidade/loyalty
+
+**Como geocodificar:**
+
+.your-turn[
+1. Instalar o plugin **MMQGIS** (*Complementos → Gerenciar e Instalar Complementos*).
+2. *MMQGIS → Geocode → Geocode CSV with Web Service*.
+3. Selecionar o CSV de clientes/endereços, o serviço **Nominatim** (gratuito) e mapear as colunas de endereço, cidade e CEP.
+4. Executar: o plugin gera uma camada de pontos com as coordenadas encontradas e um relatório dos endereços não geocodificados.
+5. Para CEPs sem logradouro completo, complementar manualmente consultando o [ViaCEP](https://viacep.com.br) (ex.: `viacep.com.br/ws/30130-170/json/`) e preenchendo bairro/logradouro antes de geocodificar novamente.
+]
+]
+
+.pull-right[
+**Dados digitais e de mobilidade:**
+- Google Popular Times (fluxo horário)
+- Meta Ads (alcance por raio geográfico)
+- Dados de operadoras celulares (ODx)
+- Waze/Here (velocidade e congestionamento)
+- Instagram location tags
+
+.tip[
+Dados móveis (CDR) são os mais precisos para medir fluxo real, mas têm alto custo e exigem contrato com operadoras.
+]
+]
+
+---
+
+## Qualidade, Escala e Limitações
+
+.your-turn[
+**Passo a passo — comparar cobertura OSM × CNPJ no QGIS:**
+
+1. Abrir a camada de farmácias extraída do OSM (QuickOSM) e a camada de farmácias do CNPJ (CNAE 4771-7/01, filtrada por `situacao = ATIVA` e `municipio = BELO HORIZONTE` — filtro aplicado com *Selecionar por Expressão* ou na "Consulta" da camada de texto delimitado).
+2. Ver o número de feições de cada camada na barra de status inferior do QGIS (ou em *Propriedades da camada → Informações → Número de feições*).
+3. Anotar `n_osm` e `n_cnpj`.
+4. Calcular a cobertura com a **Calculadora de Campos** em qualquer uma das camadas (campo virtual) ou apenas manualmente: `cobertura = (n_osm / n_cnpj) * 100`.
+]
+
+**Principais limitações a considerar:**
+- OSM: cobertura desigual (centros bem mapeados, periferias menos)
+- Censo: desatualização (4-5 anos entre edições)
+- CNPJ: inclui empresas inativas, endereços desatualizados
+- Dados digitais: viés de plataforma e perfil demográfico
+
+---
+
+## Escala Espacial e Decisão
+
+.pull-left[
+**Escala define a pergunta:**
+
+| Escala | Pergunta típica |
+|--------|----------------|
+| Nacional | Qual estado priorizar? |
+| Regional | Qual cidade? |
+| Municipal | Qual bairro? |
+| Inframunicipal | Qual quadra/rua? |
+| Microlocal | Qual lado da rua? |
+]
+
+.pull-right[
+.question[
+**Reflexão:**
+Um dado preciso em escala nacional pode ser **inútil** para decisão de ponto de venda.
+
+Um dado impreciso em microescala pode levar a **erros custosos**.
+
+Como balancear granularidade e custo de coleta?
+]
+]
+
+---
+
+## QGIS — Importar CSV com Coordenadas
+
+.your-turn[
+**Passo a passo:**
+
+1. Baixar CNPJ de farmácias de BH (CNAE 4771-7/01) em [dados.gov.br](https://dados.gov.br) e salvar como `farmacias_bh.csv`.
+2. QGIS: *Camada → Adicionar Camada → Adicionar Camada de Texto Delimitado*, apontando para `farmacias_bh.csv`.
+3. Definir campos: X = longitude, Y = latitude, SRC = SIRGAS 2000 (EPSG:4674).
+4. A camada é carregada com **todas** as linhas do CSV, incluindo registros sem coordenadas válidas — precisamos limpar dentro do próprio QGIS:
+   - Abrir a **Tabela de Atributos** → *Selecionar por Expressão* → usar a expressão `"longitude" IS NULL OR "latitude" IS NULL OR "situacao" != 'ATIVA'` para marcar os registros inválidos/inativos;
+   - Inverter a seleção (*Selecionar → Inverter Seleção*) e usar *Exportar → Salvar Feições Selecionadas Como…* para gerar uma nova camada só com CNPJs ativos e coordenadas válidas.
+5. Resultado: camada de pontos limpa sobre o mapa base.
+6. Exportar como shapefile/GeoPackage (*Exportar → Salvar Feições Como…*) para uso futuro.
+]
+
+---
+
+## Atividade Prática — Encontro 5/6
+
+.your-turn[
+**"Pipeline de dados: do IBGE ao mapa"** *(lab, 2h)*
+
+**Objetivo:** Construir base territorial de BH com dados censitários.
+
+**Passo 1 — Geometria dos setores censitários:**
+Baixar a Malha de Setores Censitários 2022 (shapefile/GeoPackage) do site do IBGE para o município 3106200 (Belo Horizonte) e adicionar via *Camada → Adicionar Camada → Adicionar Camada Vetorial*.
+
+**Passo 2 — Dados de renda por setor:**
+Baixar a tabela CSV de renda média (Agregados por Setores Censitários, Censo 2022) e adicionar via *Camada → Adicionar Camada → Adicionar Camada de Texto Delimitado*, desmarcando "Geometria de ponto".
+
+**Passo 3 — Limpar e unir:**
+Clique direito na camada de setores → *Propriedades → Junções → +* → Camada de junção = tabela de renda; Campo de junção = código do setor (`code_tract`/`CD_SETOR`) em ambas as camadas. Depois, usar *Selecionar por Expressão* com `"renda_media" IS NULL` para identificar setores sem dado e, se necessário, remover da análise com *Inverter Seleção → Exportar → Salvar Feições Selecionadas Como…*.
+
+**Passo 4 — Exportar:**
+Clique direito na camada resultante → *Exportar → Salvar Feições Como…* → formato GeoPackage → salvar como `dados/setores_renda_bh.gpkg`.
+]
+
+---
+
+## Resolução e Discussão
+
+.your-turn[
+**Passo 5 — Mapa temático no QGIS:**
+
+1. Clique direito na camada `setores_renda_bh` → *Propriedades → Simbologia*.
+2. Trocar de "Símbolo único" para **Graduado**.
+3. Valor = `renda_media`; Modo = "Quantil (Quartis)" ou "Cortes Naturais (Jenks)"; Classes = 4 ou 5.
+4. Rampa de cor: escolher uma rampa sequencial (ex.: `YlOrRd` ou uma rampa customizada com as cores `#fdf6e3 → #e9d968 → #8fada7 → #002b36`) em *Editar rampa de cores*.
+5. Aplicar e conferir a distribuição espacial no canvas.
+6. Abrir *Projeto → Novo Layout de Impressão* → nomear `mapa_renda_bh`.
+7. No layout, inserir: Mapa (arrastar retângulo), Legenda, Título ("Renda Domiciliar Média por Setor Censitário — Belo Horizonte, Censo 2022"), Escala gráfica, Seta de norte e fonte dos dados ("Fonte: IBGE — Censo 2022").
+8. Exportar como imagem: *Layout → Exportar como Imagem* → salvar em `img/mapa_renda_bh.png`.
+]
+
+**Pontos de discussão:**
+- Quantos setores ficaram sem dados? Por quê?
+- Como a distribuição de renda é espacialmente desigual?
+- Quais regiões seriam prioritárias para um produto premium?
+
+---
+
+## Conceitos-chave da Unidade 3
+
+.large[
+✅ Dados para geomarketing têm **origens diversas** — combinar é essencial
+
+✅ **Censo IBGE** é a base territorial de referência no Brasil
+
+✅ Plugins **QuickOSM** e **MMQGIS**, além dos downloads manuais do IBGE, automatizam a extração de dados públicos direto no QGIS
+
+✅ Qualidade > quantidade — avaliar **cobertura e atualização** antes de usar
+
+✅ Escala espacial determina a **pergunta que o dado pode responder**
+]
+
+---
+
+## Referências
+
+- IBGE. **Censo Demográfico 2022**. [censo2022.ibge.gov.br](https://censo2022.ibge.gov.br)
+- SEBASTIÃO, A. **A crescente importância da privacidade e segurança no geomarketing**. Amazon, 2023.
+- SEBASTIÃO, A. **Geomarketing preditivo: comportamentos, antecipando necessidades**. Amazon, 2023.
+- OpenStreetMap Contributors. [openstreetmap.org](https://www.openstreetmap.org)
+- IPEA. **IPEA Data**. [ipeadata.gov.br](http://www.ipeadata.gov.br)
+- QuickOSM. Plugin QGIS. [plugins.qgis.org/plugins/QuickOSM](https://plugins.qgis.org/plugins/QuickOSM/)
+- MMQGIS. Plugin QGIS. [plugins.qgis.org/plugins/mmqgis](https://plugins.qgis.org/plugins/mmqgis/)
+
+.footnote[
+[github.com/retaoliveira/geomarketing_03_dados_geomarketing](https://github.com/retaoliveira/geomarketing_03_dados_geomarketing)
+]

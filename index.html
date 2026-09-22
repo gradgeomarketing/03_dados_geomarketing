@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Dados para Geomarketing</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof.ª Renata Oliveira" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/all.min.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.min.css" rel="stylesheet" />
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xfdba123521242c5961bcfd9f5a86457","expires":1}</script>
+    <script src="libs/himalaya/himalaya.js"></script>
+    <script src="libs/js-cookie/js.cookie.js"></script>
+    <link href="libs/editable/editable.css" rel="stylesheet" />
+    <script src="libs/editable/editable.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"<i class=\"fa fa-clipboard\"><\/i>","success":"<i class=\"fa fa-check\" style=\"color: #90BE6D\"><\/i>","error":"<i class=\"fa fa-times-circle\" style=\"color: #F94144\"><\/i>"})</script>
+    <script src="libs/xaringanExtra_fit-screen/fit-screen.js"></script>
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <script src="libs/fabric/fabric.min.js"></script>
+    <link href="libs/xaringanExtra-scribble/scribble.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-scribble/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+    <link rel="stylesheet" href="course-overrides.css" type="text/css" />
+    <link rel="stylesheet" href="zoom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Dados para Geomarketing
+]
+.subtitle[
+## Unidade 3 | Tópicos Especiais Mercadológicos: Geomarketing
+]
+.author[
+### Prof.ª Renata Oliveira
+]
+.institute[
+### CEFET-MG – Departamento de Ciências Sociais Aplicadas
+]
+.date[
+### Setembro 2026
+]
+
+---
+
+
+
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;
+&lt;span&gt;
+&lt;a href="https://places.education" target="_blank"&gt;https://places.education&lt;/a&gt;
+&lt;/span&gt;
+&lt;/div&gt;
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+class: center, middle
+
+# Dados para Geomarketing
+
+.large[
+**Dado certo + escala certa + momento certo** =
+decisão territorial bem fundamentada.
+]
+
+---
+
+## Agenda — Unidade 3 (10h / 3 encontros)
+
+**Encontro 4 (4h)**
+- Taxonomia dos dados espaciais
+- Dados censitários e bases públicas brasileiras
+- APIs e dados abertos: IBGE, IPEA, DataSUS, INEP
+
+**Encontro 5 (4h)**
+- Dados corporativos, transacionais e digitais
+- Dados de mobilidade e footfall
+- Qualidade, escala e limitações
+- QGIS: importar CSV com coordenadas
+
+**Encontro 6 (2h)**
+- Lab prático: pipeline de dados do IBGE no QGIS
+- Limpeza e preparação básica
+
+---
+
+## Taxonomia dos Dados para Geomarketing
+
+.pull-left[
+**Por origem:**
+- Censitários (IBGE)
+- Administrativos (RAIS, CNPJ, IPTU)
+- Pesquisas de mercado
+- Transacionais (PDV, e-commerce)
+- Digitais (social media, Google, apps)
+- Sensoriamento remoto (satélite, drone)
+]
+
+.pull-right[
+**Por granularidade espacial:**
+| Nível | Exemplo |
+|-------|---------|
+| País | PIB nacional |
+| Estado | PNAD por UF |
+| Município | Censo municipal |
+| Bairro | Setor censitário |
+| CEP/Quadra | Malha de endereços |
+| Ponto | Coordenada GPS |
+]
+
+---
+
+## Dados Censitários — IBGE Censo 2022
+
+O **Censo Demográfico** é a fonte mais completa de dados socioeconômicos por setor censitário (~300 domicílios).
+
+.your-turn[
+**Passo a passo — obter dados do Censo 2022 por setor censitário (sem R):**
+
+1. Acessar [censo2022.ibge.gov.br](https://censo2022.ibge.gov.br) → **Agregados por Setores Censitários** e baixar, para Belo Horizonte (código do município 3106200):
+   - a **malha de setores censitários** (formato shapefile ou GeoPackage);
+   - a **tabela CSV de "Total de moradores"** (equivalente à Tabela SIDRA 9514, variável 93);
+   - a **tabela CSV de "Rendimento nominal médio mensal"** (equivalente à Tabela SIDRA 9605, variável 10605).
+2. No QGIS: *Camada → Adicionar Camada → Adicionar Camada Vetorial* → selecionar o shapefile/GeoPackage da malha de setores.
+3. No QGIS: *Camada → Adicionar Camada → Adicionar Camada de Texto Delimitado* → apontar para o CSV de renda, **desmarcando** a opção "Geometria de ponto" (é uma tabela sem coordenadas, só atributos).
+4. Clique direito na camada de setores → **Propriedades → Junções (Joins) → +** → Camada de junção = tabela de renda; Campo de junção = código do setor censitário (`CD_SETOR`); Campo de destino = mesmo código na malha.
+5. Repetir o passo 4 para a tabela de população.
+6. Verificar na **Tabela de Atributos** se os campos `renda_media` e `populacao` foram anexados corretamente aos polígonos.
+]
+
+.footnote[IBGE — Agregados por Setores Censitários: [censo2022.ibge.gov.br](https://censo2022.ibge.gov.br)]
+
+---
+
+## Bases Públicas Federais
+
+.your-turn[
+**Passo a passo — trazer bases federais para o QGIS:**
+
+1. **IPEA Data** (IDH, Gini, PIB municipal): baixar a série desejada em [ipeadata.gov.br](http://www.ipeadata.gov.br) como CSV (ex.: `ADH_IDHM_R`, `ADH_GINI`, por município). No QGIS, usar *Camada → Adicionar Camada → Adicionar Camada de Texto Delimitado*, desmarcando "Geometria de ponto", e depois fazer **Junção** (Propriedades → Joins) com a camada de municípios pelo código IBGE do município.
+2. **DataSUS/CNES** (estabelecimentos de saúde georreferenciados): baixar o arquivo `ESTABDADOS.zip` em `cnes.datasus.gov.br/services/arquivos/`, extrair o CSV com latitude/longitude e importar via *Camada → Adicionar Camada de Texto Delimitado*, definindo X = longitude e Y = latitude.
+3. **INEP** (escolas com coordenadas): baixar os microdados do Censo Escolar em [download.inep.gov.br/dados_abertos](https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2023.zip), filtrar o município desejado em uma planilha e importar da mesma forma que o CNES.
+4. **CNPJ/Receita Federal** (cadastro de empresas): baixar o dataset em [dados.gov.br](https://dados.gov.br/dados/conjuntos-dados/cadastro-nacional-da-pessoa-juridica---cnpj), filtrar por CNAE e município, e importar como camada de texto delimitado (se já tiver lat/lon) ou geocodificar o endereço com o plugin **MMQGIS** (ver próximos slides).
+]
+
+---
+
+## Dados Abertos: onde encontrar
+
+| Portal | URL | Destaque |
+|--------|-----|----------|
+| **IBGE** | [ibge.gov.br/geociencias](https://www.ibge.gov.br/geociencias) | Malhas, setores, censo |
+| **dados.gov.br** | [dados.gov.br](https://dados.gov.br) | +30 mil datasets federais |
+| **IPEA** | [ipeadata.gov.br](http://www.ipeadata.gov.br) | Séries econômicas e sociais |
+| **DataSUS** | [datasus.saude.gov.br](https://datasus.saude.gov.br) | Saúde, CNES, SIM, SINASC |
+| **INEP** | [inep.gov.br/microdados](https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados) | Educação, ENEM, Censo Escolar |
+| **OpenStreetMap** | [overpass-turbo.eu](https://overpass-turbo.eu) | POI, vias, edificações |
+| **ANTT/ANAC** | [dados.gov.br](https://dados.gov.br) | Transporte, aeroportos |
+
+---
+
+## OpenStreetMap via QGIS
+
+.your-turn[
+**Passo a passo — extrair farmácias de BH com o QuickOSM:**
+
+1. Instalar o plugin: *Complementos → Gerenciar e Instalar Complementos* → buscar **QuickOSM** → Instalar.
+2. Abrir *Complementos → QuickOSM → QuickOSM*.
+3. Na aba "Consulta rápida": Key = `amenity`, Value = `pharmacy`.
+4. Em "Área de interesse", escolher **Selecionar por lugar** e digitar `Belo Horizonte, Brazil` (o QuickOSM resolve o nome via Nominatim e monta o bounding box automaticamente).
+5. Clicar em **Executar consulta**.
+6. O QuickOSM adiciona automaticamente uma camada de pontos (e, se houver, polígonos/linhas) com todas as farmácias de BH mapeadas no OSM.
+7. Para estilizar: *Propriedades da camada → Simbologia* → símbolo único, cor `#E9AFA3`.
+]
+
+.tip[
+O QuickOSM consulta a **Overpass API** por trás dos panos — gratuita, sem limite de requisições para consultas moderadas. Ideal para POI, vias, edificações.
+]
+
+.footnote[QuickOSM: [plugins.qgis.org/plugins/QuickOSM](https://plugins.qgis.org/plugins/QuickOSM/)]
+
+---
+
+## Dados Corporativos e Transacionais
+
+.pull-left[
+**Fontes corporativas típicas:**
+- Histórico de transações (PDV, e-commerce)
+- Cadastro de clientes com CEP
+- CRM com localização de visitas
+- Dados de fidelidade/loyalty
+
+**Como geocodificar:**
+
+.your-turn[
+1. Instalar o plugin **MMQGIS** (*Complementos → Gerenciar e Instalar Complementos*).
+2. *MMQGIS → Geocode → Geocode CSV with Web Service*.
+3. Selecionar o CSV de clientes/endereços, o serviço **Nominatim** (gratuito) e mapear as colunas de endereço, cidade e CEP.
+4. Executar: o plugin gera uma camada de pontos com as coordenadas encontradas e um relatório dos endereços não geocodificados.
+5. Para CEPs sem logradouro completo, complementar manualmente consultando o [ViaCEP](https://viacep.com.br) (ex.: `viacep.com.br/ws/30130-170/json/`) e preenchendo bairro/logradouro antes de geocodificar novamente.
+]
+]
+
+.pull-right[
+**Dados digitais e de mobilidade:**
+- Google Popular Times (fluxo horário)
+- Meta Ads (alcance por raio geográfico)
+- Dados de operadoras celulares (ODx)
+- Waze/Here (velocidade e congestionamento)
+- Instagram location tags
+
+.tip[
+Dados móveis (CDR) são os mais precisos para medir fluxo real, mas têm alto custo e exigem contrato com operadoras.
+]
+]
+
+---
+
+## Qualidade, Escala e Limitações
+
+.your-turn[
+**Passo a passo — comparar cobertura OSM × CNPJ no QGIS:**
+
+1. Abrir a camada de farmácias extraída do OSM (QuickOSM) e a camada de farmácias do CNPJ (CNAE 4771-7/01, filtrada por `situacao = ATIVA` e `municipio = BELO HORIZONTE` — filtro aplicado com *Selecionar por Expressão* ou na "Consulta" da camada de texto delimitado).
+2. Ver o número de feições de cada camada na barra de status inferior do QGIS (ou em *Propriedades da camada → Informações → Número de feições*).
+3. Anotar `n_osm` e `n_cnpj`.
+4. Calcular a cobertura com a **Calculadora de Campos** em qualquer uma das camadas (campo virtual) ou apenas manualmente: `cobertura = (n_osm / n_cnpj) * 100`.
+]
+
+**Principais limitações a considerar:**
+- OSM: cobertura desigual (centros bem mapeados, periferias menos)
+- Censo: desatualização (4-5 anos entre edições)
+- CNPJ: inclui empresas inativas, endereços desatualizados
+- Dados digitais: viés de plataforma e perfil demográfico
+
+---
+
+## Escala Espacial e Decisão
+
+.pull-left[
+**Escala define a pergunta:**
+
+| Escala | Pergunta típica |
+|--------|----------------|
+| Nacional | Qual estado priorizar? |
+| Regional | Qual cidade? |
+| Municipal | Qual bairro? |
+| Inframunicipal | Qual quadra/rua? |
+| Microlocal | Qual lado da rua? |
+]
+
+.pull-right[
+.question[
+**Reflexão:**
+Um dado preciso em escala nacional pode ser **inútil** para decisão de ponto de venda.
+
+Um dado impreciso em microescala pode levar a **erros custosos**.
+
+Como balancear granularidade e custo de coleta?
+]
+]
+
+---
+
+## QGIS — Importar CSV com Coordenadas
+
+.your-turn[
+**Passo a passo:**
+
+1. Baixar CNPJ de farmácias de BH (CNAE 4771-7/01) em [dados.gov.br](https://dados.gov.br) e salvar como `farmacias_bh.csv`.
+2. QGIS: *Camada → Adicionar Camada → Adicionar Camada de Texto Delimitado*, apontando para `farmacias_bh.csv`.
+3. Definir campos: X = longitude, Y = latitude, SRC = SIRGAS 2000 (EPSG:4674).
+4. A camada é carregada com **todas** as linhas do CSV, incluindo registros sem coordenadas válidas — precisamos limpar dentro do próprio QGIS:
+   - Abrir a **Tabela de Atributos** → *Selecionar por Expressão* → usar a expressão `"longitude" IS NULL OR "latitude" IS NULL OR "situacao" != 'ATIVA'` para marcar os registros inválidos/inativos;
+   - Inverter a seleção (*Selecionar → Inverter Seleção*) e usar *Exportar → Salvar Feições Selecionadas Como…* para gerar uma nova camada só com CNPJs ativos e coordenadas válidas.
+5. Resultado: camada de pontos limpa sobre o mapa base.
+6. Exportar como shapefile/GeoPackage (*Exportar → Salvar Feições Como…*) para uso futuro.
+]
+
+---
+
+## Atividade Prática — Encontro 5/6
+
+.your-turn[
+**"Pipeline de dados: do IBGE ao mapa"** *(lab, 2h)*
+
+**Objetivo:** Construir base territorial de BH com dados censitários.
+
+**Passo 1 — Geometria dos setores censitários:**
+Baixar a Malha de Setores Censitários 2022 (shapefile/GeoPackage) do site do IBGE para o município 3106200 (Belo Horizonte) e adicionar via *Camada → Adicionar Camada → Adicionar Camada Vetorial*.
+
+**Passo 2 — Dados de renda por setor:**
+Baixar a tabela CSV de renda média (Agregados por Setores Censitários, Censo 2022) e adicionar via *Camada → Adicionar Camada → Adicionar Camada de Texto Delimitado*, desmarcando "Geometria de ponto".
+
+**Passo 3 — Limpar e unir:**
+Clique direito na camada de setores → *Propriedades → Junções → +* → Camada de junção = tabela de renda; Campo de junção = código do setor (`code_tract`/`CD_SETOR`) em ambas as camadas. Depois, usar *Selecionar por Expressão* com `"renda_media" IS NULL` para identificar setores sem dado e, se necessário, remover da análise com *Inverter Seleção → Exportar → Salvar Feições Selecionadas Como…*.
+
+**Passo 4 — Exportar:**
+Clique direito na camada resultante → *Exportar → Salvar Feições Como…* → formato GeoPackage → salvar como `dados/setores_renda_bh.gpkg`.
+]
+
+---
+
+## Resolução e Discussão
+
+.your-turn[
+**Passo 5 — Mapa temático no QGIS:**
+
+1. Clique direito na camada `setores_renda_bh` → *Propriedades → Simbologia*.
+2. Trocar de "Símbolo único" para **Graduado**.
+3. Valor = `renda_media`; Modo = "Quantil (Quartis)" ou "Cortes Naturais (Jenks)"; Classes = 4 ou 5.
+4. Rampa de cor: escolher uma rampa sequencial (ex.: `YlOrRd` ou uma rampa customizada com as cores `#fdf6e3 → #e9d968 → #8fada7 → #002b36`) em *Editar rampa de cores*.
+5. Aplicar e conferir a distribuição espacial no canvas.
+6. Abrir *Projeto → Novo Layout de Impressão* → nomear `mapa_renda_bh`.
+7. No layout, inserir: Mapa (arrastar retângulo), Legenda, Título ("Renda Domiciliar Média por Setor Censitário — Belo Horizonte, Censo 2022"), Escala gráfica, Seta de norte e fonte dos dados ("Fonte: IBGE — Censo 2022").
+8. Exportar como imagem: *Layout → Exportar como Imagem* → salvar em `img/mapa_renda_bh.png`.
+]
+
+**Pontos de discussão:**
+- Quantos setores ficaram sem dados? Por quê?
+- Como a distribuição de renda é espacialmente desigual?
+- Quais regiões seriam prioritárias para um produto premium?
+
+---
+
+## Conceitos-chave da Unidade 3
+
+.large[
+✅ Dados para geomarketing têm **origens diversas** — combinar é essencial
+
+✅ **Censo IBGE** é a base territorial de referência no Brasil
+
+✅ Plugins **QuickOSM** e **MMQGIS**, além dos downloads manuais do IBGE, automatizam a extração de dados públicos direto no QGIS
+
+✅ Qualidade &gt; quantidade — avaliar **cobertura e atualização** antes de usar
+
+✅ Escala espacial determina a **pergunta que o dado pode responder**
+]
+
+---
+
+## Referências
+
+- IBGE. **Censo Demográfico 2022**. [censo2022.ibge.gov.br](https://censo2022.ibge.gov.br)
+- SEBASTIÃO, A. **A crescente importância da privacidade e segurança no geomarketing**. Amazon, 2023.
+- SEBASTIÃO, A. **Geomarketing preditivo: comportamentos, antecipando necessidades**. Amazon, 2023.
+- OpenStreetMap Contributors. [openstreetmap.org](https://www.openstreetmap.org)
+- IPEA. **IPEA Data**. [ipeadata.gov.br](http://www.ipeadata.gov.br)
+- QuickOSM. Plugin QGIS. [plugins.qgis.org/plugins/QuickOSM](https://plugins.qgis.org/plugins/QuickOSM/)
+- MMQGIS. Plugin QGIS. [plugins.qgis.org/plugins/mmqgis](https://plugins.qgis.org/plugins/mmqgis/)
+
+.footnote[
+[github.com/retaoliveira/geomarketing_03_dados_geomarketing](https://github.com/retaoliveira/geomarketing_03_dados_geomarketing)
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "ratio": "16:9",
+  "highlightLines": true,
+  "highlightStyle": "solarized-light",
+  "countIncrementalSlides": false,
+  "slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<div class="image-zoom-overlay" id="image-zoom-overlay" aria-hidden="true">
+  <button class="image-zoom-close" type="button" aria-label="Fechar imagem ampliada">×</button>
+  <img class="image-zoom-preview" alt="">
+</div>
+
+<script>
+(function () {
+  var overlay = document.getElementById("image-zoom-overlay");
+  var preview = overlay.querySelector(".image-zoom-preview");
+  var closeButton = overlay.querySelector(".image-zoom-close");
+
+  function enhanceImages() {
+    document.querySelectorAll(".remark-slide-content img").forEach(function (image) {
+      image.classList.add("zoomable-figure");
+      image.setAttribute("tabindex", "0");
+      image.setAttribute("role", "button");
+      image.setAttribute("aria-label", image.alt ? "Ampliar figura: " + image.alt : "Ampliar figura");
+      image.setAttribute("title", "Clique para ampliar");
+    });
+  }
+
+  function openZoom(image) {
+    preview.src = image.currentSrc || image.src;
+    preview.alt = image.alt || "Figura ampliada";
+    overlay.classList.add("is-open");
+    overlay.setAttribute("aria-hidden", "false");
+    closeButton.focus();
+  }
+
+  function closeZoom() {
+    overlay.classList.remove("is-open");
+    overlay.setAttribute("aria-hidden", "true");
+    preview.removeAttribute("src");
+  }
+
+  document.addEventListener("click", function (event) {
+    var image = event.target.closest(".remark-slide-content img");
+    if (image) {
+      event.preventDefault();
+      event.stopPropagation();
+      openZoom(image);
+      return;
+    }
+    if (event.target === overlay || event.target === closeButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeZoom();
+    }
+  }, true);
+
+  document.addEventListener("keydown", function (event) {
+    if ((event.key === "Enter" || event.key === " ") &&
+        event.target.matches(".remark-slide-content img")) {
+      event.preventDefault();
+      event.stopPropagation();
+      openZoom(event.target);
+    } else if (event.key === "Escape" && overlay.classList.contains("is-open")) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeZoom();
+    }
+  }, true);
+
+  window.addEventListener("load", function () {
+    window.setTimeout(enhanceImages, 0);
+  });
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
